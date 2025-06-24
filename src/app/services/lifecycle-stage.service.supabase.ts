@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, combineLatest } from 'rxjs';
+import { Observable, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { map, switchMap, catchError, tap } from 'rxjs/operators';
 import { LifecycleStage, LifecycleStageStatus } from '../models/lifecycle-stage.model';
 import { Rule } from '../models/rule.model';
@@ -69,31 +69,33 @@ export class LifecycleStageService {
   /**
    * Track the currently selected stage ID
    */
-  private selectedStageId: string | null = null;
+  // Use BehaviorSubject so components can react to stage changes
+  private selectedStageId$ = new BehaviorSubject<string | null>(null);
 
   /**
    * Get the currently selected stage ID
    */
   getSelectedStageId(): Observable<string | null> {
-    return of(this.selectedStageId);
+    return this.selectedStageId$.asObservable();
   }
 
   /**
    * Get the currently selected stage
    */
   getSelectedStage(): Observable<LifecycleStage | undefined> {
-    if (!this.selectedStageId) {
+    const stageId = this.selectedStageId$.getValue();
+    if (!stageId) {
       return of(undefined);
     }
-    
-    return this.getStageById(this.selectedStageId);
+
+    return this.getStageById(stageId);
   }
 
   /**
    * Select a lifecycle stage by ID
    */
   selectStage(id: string): void {
-    this.selectedStageId = id;
+    this.selectedStageId$.next(id);
   }
 
   /**
