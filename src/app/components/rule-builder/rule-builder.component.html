@@ -11,7 +11,7 @@
   <!-- Rules Toolbar -->
   <p-toolbar styleClass="mb-4 gap-2">
     <ng-template pTemplate="left">
-      <button pButton pRipple label="New Rule" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+      <button pButton pRipple label="New Rule" icon="pi pi-plus" class="p-button-success mr-2 cta-button" (click)="openNew()"></button>
     </ng-template>
   </p-toolbar>
 
@@ -83,7 +83,7 @@
             <i class="pi pi-info-circle text-4xl mb-2 text-gray-400"></i>
             <span class="font-semibold text-lg mb-1">No Rules Found</span>
             <p class="text-gray-500 mb-3">Get started by creating your first rule.</p>
-            <button pButton label="Create Rule" icon="pi pi-plus" (click)="openNew()"></button>
+            <button pButton label="Create Rule" icon="pi pi-plus" class="cta-button" (click)="openNew()"></button>
           </div>
         </td>
       </tr>

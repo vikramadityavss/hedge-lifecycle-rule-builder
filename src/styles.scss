@@ -186,3 +186,35 @@ html, body {
     color: white;
   }
 }
+
+/* CTA button styling */
+.cta-button {
+  border: 2px solid var(--primary-color);
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.cta-button:hover,
+.cta-button:focus {
+  background-color: var(--primary-color-light);
+  border-color: var(--primary-color-light);
+  color: #fff;
+}
+
+/* Header typography */
+h1, h2, h3 {
+  color: var(--primary-color-dark);
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
