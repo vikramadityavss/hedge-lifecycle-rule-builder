@@ -228,15 +228,6 @@ export class RuleBuilderComponent implements OnInit {
   }
 
   openNew(): void {
-    if (!this.currentStageId) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Please select a lifecycle stage first'
-      });
-      return;
-    }
-    
     this.isNewRule = true;
     this.currentRule = this.ruleService.createRule('');
     this.ruleForm.reset({
