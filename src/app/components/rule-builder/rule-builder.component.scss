@@ -161,4 +161,14 @@
       background-color: #4caf50;
     }
   }
+
+  /* Ensure create rule dialog is easy to read */
+  .p-dialog-content {
+    background-color: #fff;
+  }
+
+  /* Remove dark overlay when dialog is open */
+  .p-dialog-mask {
+    background-color: transparent;
+  }
 }
