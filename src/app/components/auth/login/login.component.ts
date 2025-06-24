@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -41,7 +41,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private ngZone: NgZone
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -53,7 +54,7 @@ export class LoginComponent implements OnInit {
     // Check if user is already logged in
     this.authService.isAuthenticated().subscribe(authenticated => {
       if (authenticated) {
-        this.router.navigate(['/']);
+        this.ngZone.run(() => this.router.navigate(['/']));
       }
     });
     
@@ -82,7 +83,7 @@ export class LoginComponent implements OnInit {
           summary: 'Success',
           detail: 'You have successfully logged in.'
         });
-        this.router.navigate(['/']);
+        this.ngZone.run(() => this.router.navigate(['/']));
       },
       error: (error) => {
         this.messageService.add({
