@@ -1,0 +1,4 @@
+build: npm run build
+build_path: dist/hedge-lifecycle-rule-builder
+dev: npm run start -- --port 4201
+install: npm install

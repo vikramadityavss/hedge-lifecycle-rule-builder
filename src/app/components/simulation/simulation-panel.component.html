@@ -1,0 +1,314 @@
+<div class="simulation-panel" [class.visible]="visible">
+  <div class="simulation-header">
+    <div class="flex justify-content-between align-items-center">
+      <h2 class="text-xl font-bold">Simulation: {{ stageName }}</h2>
+      <button pButton icon="pi pi-times" class="p-button-rounded p-button-text" (click)="close()"></button>
+    </div>
+    <p class="text-sm text-gray-500">Test rules against sample data</p>
+  </div>
+  
+  <p-divider></p-divider>
+  
+  <div class="simulation-content">
+    <!-- Simulation Form -->
+    <form [formGroup]="simulationForm" class="p-fluid">
+      <p-card styleClass="mb-3">
+        <ng-template pTemplate="title">
+          <div class="flex justify-content-between align-items-center">
+            <span>Simulation Parameters</span>
+            <div>
+              <button pButton label="Reset" icon="pi pi-refresh" class="p-button-outlined p-button-secondary mr-2" (click)="resetForm()"></button>
+              <button pButton label="Save" icon="pi pi-save" class="p-button-outlined mr-2" (click)="saveSimulationEnvironment()"></button>
+              <button pButton label="Run Simulation" icon="pi pi-play" class="p-button-success" [disabled]="simulationForm.invalid || isSimulating" (click)="runSimulation()"></button>
+            </div>
+          </div>
+        </ng-template>
+        
+        <div class="grid formgrid">
+          <div class="field col-12 md:col-6">
+            <label for="instructionType" class="block font-medium">Instruction Type*</label>
+            <input id="instructionType" type="text" pInputText formControlName="instructionType" placeholder="Enter instruction type" />
+            <small *ngIf="simulationForm.get('instructionType')?.invalid && simulationForm.get('instructionType')?.touched" class="p-error">Instruction type is required</small>
+          </div>
+          
+          <div class="field col-12 md:col-6">
+            <label for="exposureCurrency" class="block font-medium">Exposure Currency*</label>
+            <input id="exposureCurrency" type="text" pInputText formControlName="exposureCurrency" placeholder="Enter currency" />
+            <small *ngIf="simulationForm.get('exposureCurrency')?.invalid && simulationForm.get('exposureCurrency')?.touched" class="p-error">Exposure currency is required</small>
+          </div>
+          
+          <div class="field col-12 md:col-4">
+            <label for="hedgeAmount" class="block font-medium">Hedge Amount*</label>
+            <p-inputNumber id="hedgeAmount" formControlName="hedgeAmount" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+            <small *ngIf="simulationForm.get('hedgeAmount')?.invalid && simulationForm.get('hedgeAmount')?.touched" class="p-error">Valid hedge amount is required</small>
+          </div>
+          
+          <div class="field col-12 md:col-4">
+            <label for="usdPbDepo" class="block font-medium">USD PB Depo*</label>
+            <p-inputNumber id="usdPbDepo" formControlName="usdPbDepo" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+            <small *ngIf="simulationForm.get('usdPbDepo')?.invalid && simulationForm.get('usdPbDepo')?.touched" class="p-error">Valid USD PB Depo amount is required</small>
+          </div>
+          
+          <div class="field col-12 md:col-4">
+            <label for="optimalCAR" class="block font-medium">Optimal CAR*</label>
+            <p-inputNumber id="optimalCAR" formControlName="optimalCAR" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+            <small *ngIf="simulationForm.get('optimalCAR')?.invalid && simulationForm.get('optimalCAR')?.touched" class="p-error">Valid optimal CAR is required</small>
+          </div>
+        </div>
+      </p-card>
+      
+      <!-- Entity Table -->
+      <p-card styleClass="mb-3">
+        <ng-template pTemplate="title">
+          <div class="flex justify-content-between align-items-center">
+            <span>Entity Data</span>
+            <button pButton label="Add Entity" icon="pi pi-plus" class="p-button-outlined" (click)="addEntity()"></button>
+          </div>
+        </ng-template>
+        
+        <div class="entity-table">
+          <p-table [value]="entities.controls" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>NAV Type</th>
+                <th>NAV</th>
+                <th>CAR Exempt</th>
+                <th>Optimal CAR</th>
+                <th>Already Hedged</th>
+                <th style="width: 6rem">Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-entityForm let-i="rowIndex">
+              <tr [formGroup]="entityForm">
+                <td>
+                  <input type="text" pInputText formControlName="name" placeholder="Entity name" />
+                </td>
+                <td>
+                  <p-dropdown [options]="entityTypeOptions" formControlName="type" [style]="{'width':'100%'}"></p-dropdown>
+                </td>
+                <td>
+                  <p-dropdown [options]="navTypeOptions" formControlName="navType" [style]="{'width':'100%'}"></p-dropdown>
+                </td>
+                <td>
+                  <p-inputNumber formControlName="nav" [min]="0" [showButtons]="false" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+                </td>
+                <td>
+                  <p-checkbox formControlName="carExempt" [binary]="true"></p-checkbox>
+                </td>
+                <td>
+                  <p-inputNumber formControlName="optimalCAR" [min]="0" [showButtons]="false" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+                </td>
+                <td>
+                  <p-inputNumber formControlName="alreadyHedged" [min]="0" [showButtons]="false" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"></p-inputNumber>
+                </td>
+                <td>
+                  <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 
+                    [disabled]="entities.length <= 1"
+                    (click)="removeEntity(i)"></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </form>
+    
+    <!-- Simulation Results -->
+    <div class="simulation-results" *ngIf="simulationResult || isSimulating">
+      <p-card>
+        <ng-template pTemplate="title">
+          <span>Simulation Results</span>
+        </ng-template>
+        
+        <!-- Loading Indicator -->
+        <div *ngIf="isSimulating" class="flex flex-column align-items-center justify-content-center p-4">
+          <p-progressSpinner [style]="{'width':'50px','height':'50px'}" styleClass="mb-2"></p-progressSpinner>
+          <span>Running simulation...</span>
+        </div>
+        
+        <!-- Results Summary -->
+        <div *ngIf="simulationResult && !isSimulating">
+          <div class="result-summary mb-3">
+            <div class="flex justify-content-between align-items-center">
+              <h3 class="text-lg font-bold">Final Result</h3>
+              <p-tag [value]="simulationResult.status" [severity]="getStatusSeverity(simulationResult.status)"></p-tag>
+            </div>
+            
+            <div *ngIf="simulationResult.reason" class="mt-2">
+              <span class="font-medium">Reason:</span> {{ simulationResult.reason }}
+            </div>
+          </div>
+          
+          <p-divider></p-divider>
+          
+          <!-- Entity Allocations -->
+          <div class="entity-allocations mb-3">
+            <h3 class="text-lg font-bold mb-2">Entity Allocations</h3>
+            
+            <p-table [value]="entityAllocations" responsiveLayout="scroll" styleClass="p-datatable-sm">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Entity</th>
+                  <th>NAV After CAR</th>
+                  <th>Buffer</th>
+                  <th>Available</th>
+                  <th>Allocation</th>
+                  <th>Status</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-allocation>
+                <tr>
+                  <td>{{ allocation.entityName }}</td>
+                  <td>{{ allocation.navAfterCAR | number:'1.2-2' }}</td>
+                  <td>{{ allocation.buffer | number:'1.2-2' }}</td>
+                  <td>{{ allocation.availableAmount | number:'1.2-2' }}</td>
+                  <td>{{ allocation.allocation | number:'1.2-2' }}</td>
+                  <td>
+                    <p-tag [value]="allocation.exhausted ? 'Exhausted' : 'Available'" 
+                           [severity]="allocation.exhausted ? 'danger' : 'success'"></p-tag>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="6" class="text-center">No allocation data available</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+          
+          <p-divider></p-divider>
+          
+          <!-- Rule Execution Trace -->
+          <div class="execution-trace">
+            <h3 class="text-lg font-bold mb-2">Rule Execution Trace</h3>
+            
+            <div class="trace-log">
+              <p-card *ngFor="let entry of traceLog; let i = index; trackBy: trackByFn" 
+                     styleClass="mb-2" 
+                     [ngClass]="{'trace-success': entry.conditionEvaluation, 'trace-failure': !entry.conditionEvaluation}">
+                <ng-template pTemplate="title">
+                  <div class="flex justify-content-between align-items-center">
+                    <span>Rule: {{ entry.ruleName }}</span>
+                    <p-tag [value]="entry.conditionEvaluation ? 'Condition Met' : 'Condition Not Met'" 
+                           [severity]="entry.conditionEvaluation ? 'success' : 'danger'"></p-tag>
+                  </div>
+                </ng-template>
+                
+                <div *ngIf="entry.conditionEvaluation && entry.actionsExecuted?.length" class="mt-2">
+                  <span class="font-medium">Actions executed:</span>
+                  <ul class="action-list">
+                    <li *ngFor="let action of entry.actionsExecuted">
+                      <span class="action-type">{{ action.type }}</span>: 
+                      <span *ngIf="action.field">{{ action.field }} = {{ getValueDisplay(action.value) }}</span>
+                      <span *ngIf="action.message">{{ action.message }}</span>
+                      <span *ngIf="action.lifecycleStage">Apply stage: {{ action.lifecycleStage }}</span>
+                      <span *ngIf="action.type === 'haltProcessing'">Halt further processing</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div *ngIf="entry.inputState || entry.outputState" class="state-changes mt-2">
+                  <p-divider></p-divider>
+                  <div class="grid">
+                    <div class="col-6" *ngIf="entry.inputState">
+                      <span class="font-medium">Input state:</span>
+                      <pre class="state-json">{{ entry.inputState | json }}</pre>
+                    </div>
+                    <div class="col-6" *ngIf="entry.outputState">
+                      <span class="font-medium">Output state:</span>
+                      <pre class="state-json">{{ entry.outputState | json }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </p-card>
+              
+              <div *ngIf="traceLog.length === 0" class="text-center p-4 bg-gray-50">
+                <p class="text-gray-500">No execution trace available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>
+
+<style>
+  .simulation-panel {
+    position: fixed;
+    top: 0;
+    right: -800px;
+    width: 800px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .simulation-panel.visible {
+    right: 0;
+  }
+  
+  .simulation-header {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .simulation-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  
+  .entity-table {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .trace-log {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .trace-success {
+    border-left: 4px solid #2ecc71;
+  }
+  
+  .trace-failure {
+    border-left: 4px solid #e74c3c;
+  }
+  
+  .action-list {
+    list-style: none;
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+  
+  .action-list li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .action-type {
+    font-weight: 600;
+    color: #3498db;
+  }
+  
+  .state-json {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    max-height: 100px;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+  }
+</style>

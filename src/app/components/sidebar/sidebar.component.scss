@@ -1,0 +1,64 @@
+/* Sidebar styling */
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebar {
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  height: 100%;
+  padding: 1rem;
+  width: 100%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.stages-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stage-item {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #e9ecef;
+  }
+  
+  &.active {
+    background-color: #e7f4ff;
+    border-left: 3px solid #2196f3;
+  }
+}
+
+.stage-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-stage-button {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    padding: 0.5rem;
+  }
+}

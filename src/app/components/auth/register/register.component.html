@@ -1,0 +1,110 @@
+<div class="flex justify-content-center align-items-center min-h-screen bg-gray-100">
+  <p-toast></p-toast>
+  
+  <p-card styleClass="p-4 w-full md:w-6" header="Hedge Lifecycle Rule Builder">
+    <div class="flex flex-column align-items-center mb-4">
+      <h2 class="text-2xl font-semibold text-center mb-2">Create an Account</h2>
+      <p class="text-center text-gray-600">Join us to manage your hedge lifecycle rules</p>
+    </div>
+    
+    <form [formGroup]="registerForm" (ngSubmit)="register()" class="p-fluid">
+      <div class="field mb-4">
+        <label for="email" class="block text-900 font-medium mb-2">Email</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-envelope"></i>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            placeholder="Email address"
+            [ngClass]="{'ng-invalid ng-dirty': registerForm.controls['email'].invalid && registerForm.controls['email'].touched}"
+            autocomplete="email"
+          />
+        </span>
+        <small
+          *ngIf="registerForm.controls['email'].invalid && registerForm.controls['email'].touched"
+          class="p-error block mt-1"
+        >
+          Please enter a valid email address
+        </small>
+      </div>
+
+      <div class="field mb-4">
+        <label for="password" class="block text-900 font-medium mb-2">Password</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-lock"></i>
+          <input
+            id="password"
+            type="password"
+            pPassword
+            formControlName="password"
+            placeholder="Create a password"
+            [ngClass]="{'ng-invalid ng-dirty': registerForm.controls['password'].invalid && registerForm.controls['password'].touched}"
+            [feedback]="true"
+            autocomplete="new-password"
+          />
+        </span>
+        <small
+          *ngIf="registerForm.controls['password'].invalid && registerForm.controls['password'].touched"
+          class="p-error block mt-1"
+        >
+          Password must be at least 6 characters
+        </small>
+      </div>
+      
+      <div class="field mb-4">
+        <label for="confirmPassword" class="block text-900 font-medium mb-2">Confirm Password</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-lock"></i>
+          <input
+            id="confirmPassword"
+            type="password"
+            pPassword
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [ngClass]="{'ng-invalid ng-dirty': (registerForm.controls['confirmPassword'].touched && 
+                                               registerForm.hasError('passwordMismatch'))}"
+            [feedback]="false"
+            autocomplete="new-password"
+          />
+        </span>
+        <small
+          *ngIf="registerForm.controls['confirmPassword'].touched && registerForm.hasError('passwordMismatch')"
+          class="p-error block mt-1"
+        >
+          Passwords do not match
+        </small>
+      </div>
+
+      <div class="field mb-4">
+        <p class="text-sm text-gray-600">
+          By registering, you agree to our Terms of Service and Privacy Policy.
+        </p>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Create Account"
+        icon="pi pi-user-plus"
+        class="p-button-primary w-full"
+        [disabled]="loading || registerForm.invalid"
+      ></button>
+      <div *ngIf="loading" class="flex justify-content-center mt-3">
+        <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+      </div>
+    </form>
+
+    <p-divider align="center">
+      <span class="text-600 font-normal">OR</span>
+    </p-divider>
+
+    <div class="flex justify-content-center">
+      <p class="text-center">
+        Already have an account?
+        <a [routerLink]="['/login']" class="no-underline text-blue-500 font-medium">Sign In</a>
+      </p>
+    </div>
+  </p-card>
+</div>

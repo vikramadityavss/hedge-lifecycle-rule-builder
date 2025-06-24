@@ -1,0 +1,50 @@
+{
+  "name": "hedge-lifecycle-rule-builder",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "node ./node_modules/@angular/cli/bin/ng.js",
+    "start": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng.js serve --host 0.0.0.0 --port 4201 --disable-host-check --poll=500 --configuration=development",
+    "build": "node ./node_modules/@angular/cli/bin/ng.js build",
+    "watch": "node ./node_modules/@angular/cli/bin/ng.js build --watch --configuration development",
+    "test": "node ./node_modules/@angular/cli/bin/ng.js test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^17.3.0",
+    "@angular/cdk": "^17.3.0",
+    "@angular/common": "^17.3.0",
+    "@angular/compiler": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "@angular/platform-browser-dynamic": "^17.3.0",
+    "@angular/router": "^17.3.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "@types/node": "^20.11.0",
+    "ag-grid-angular": "^30.2.1",
+    "ag-grid-community": "^30.2.1",
+    "autoprefixer": "^10.4.16",
+    "json-logic-js": "^2.0.2",
+    "postcss": "^8.4.31",
+    "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
+    "primeng": "^17.18.15",
+    "rxjs": "~7.8.0",
+    "tailwindcss": "^3.3.5",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.3"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.17",
+    "@angular/cli": "^17.3.17",
+    "@angular/compiler-cli": "^17.3.0",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.4.2"
+  }
+}

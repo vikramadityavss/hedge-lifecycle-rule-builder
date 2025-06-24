@@ -1,0 +1,85 @@
+<div class="flex justify-content-center align-items-center min-h-screen bg-gray-100">
+  <p-toast></p-toast>
+  
+  <p-card styleClass="p-4 w-full md:w-6" header="Hedge Lifecycle Rule Builder">
+    <div class="flex flex-column align-items-center mb-4">
+      <h2 class="text-2xl font-semibold text-center mb-2">Sign In</h2>
+      <p class="text-center text-gray-600">Welcome back! Please sign in to your account.</p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="p-fluid">
+      <div class="field mb-4">
+        <label for="email" class="block text-900 font-medium mb-2">Email</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-envelope"></i>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            placeholder="Email address"
+            [ngClass]="{'ng-invalid ng-dirty': loginForm.controls['email'].invalid && loginForm.controls['email'].touched}"
+            autocomplete="email"
+          />
+        </span>
+        <small
+          *ngIf="loginForm.controls['email'].invalid && loginForm.controls['email'].touched"
+          class="p-error block mt-1"
+        >
+          Please enter a valid email address
+        </small>
+      </div>
+
+      <div class="field mb-4">
+        <label for="password" class="block text-900 font-medium mb-2">Password</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-lock"></i>
+          <input
+            id="password"
+            type="password"
+            pPassword
+            formControlName="password"
+            placeholder="Password"
+            [ngClass]="{'ng-invalid ng-dirty': loginForm.controls['password'].invalid && loginForm.controls['password'].touched}"
+            [feedback]="false"
+            autocomplete="current-password"
+          />
+        </span>
+        <small
+          *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched"
+          class="p-error block mt-1"
+        >
+          Password is required
+        </small>
+      </div>
+
+      <div class="flex justify-content-between align-items-center mb-4">
+        <p-checkbox [binary]="true" inputId="rememberMe" label="Remember me"></p-checkbox>
+        <a href="javascript:void(0)" class="no-underline text-blue-500 font-medium">Forgot password?</a>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Sign In"
+        icon="pi pi-sign-in"
+        class="p-button-primary w-full"
+        [disabled]="loading || loginForm.invalid"
+      ></button>
+      <div *ngIf="loading" class="flex justify-content-center mt-3">
+        <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+      </div>
+    </form>
+
+    <p-divider align="center">
+      <span class="text-600 font-normal">OR</span>
+    </p-divider>
+
+    <div class="flex justify-content-center">
+      <p class="text-center">
+        Don't have an account?
+        <a [routerLink]="['/register']" class="no-underline text-blue-500 font-medium">Sign Up</a>
+      </p>
+    </div>
+  </p-card>
+</div>

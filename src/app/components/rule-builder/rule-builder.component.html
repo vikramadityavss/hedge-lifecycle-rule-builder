@@ -1,0 +1,421 @@
+<div class="max-w-full mx-auto p-4">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="text-2xl font-bold text-slate-800">Hedge Lifecycle Rule Builder</h1>
+    <p class="text-slate-600">Create and manage rules to automate hedge lifecycle management.</p>
+  </div>
+
+  <!-- Rules Toolbar -->
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <button pButton pRipple label="New Rule" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <!-- Rules Table -->
+  <p-table 
+    [value]="rules" 
+    [tableStyle]="{'min-width': '60rem'}"
+    [paginator]="true" 
+    [rows]="10" 
+    [rowsPerPageOptions]="[5, 10, 25]"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    [globalFilterFields]="['name', 'description', 'status']"
+    responsiveLayout="scroll">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-8rem">Rule ID</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Conditions</th>
+        <th>Actions</th>
+        <th>Last Updated</th>
+        <th style="width: 8rem">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rule>
+      <tr>
+        <td>{{ rule.id }}</td>
+        <td>
+          <div class="flex align-items-center gap-2">
+            <span class="font-bold">{{ rule.name }}</span>
+          </div>
+          <div class="text-xs text-gray-500 mt-1" *ngIf="rule.description">{{ rule.description }}</div>
+        </td>
+        <td>
+          <p-tag 
+            [value]="rule.status" 
+            [severity]="getStatusSeverity(rule.status)"
+          ></p-tag>
+        </td>
+        <td>
+          <p-tag 
+            [value]="rule.priority" 
+            [severity]="getPrioritySeverity(rule.priority)"
+          ></p-tag>
+        </td>
+        <td>
+          <span class="text-sm">{{ rule.conditions.conditions.length }} condition(s)</span>
+        </td>
+        <td>
+          <span class="text-sm">{{ rule.actions.length }} action(s)</span>
+        </td>
+        <td>
+          <span>{{ rule.updatedAt | date:'medium' }}</span>
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-sm" (click)="editRule(rule)"></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" (click)="deleteRule(rule)"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center p-4">
+          <div class="flex flex-column align-items-center">
+            <i class="pi pi-info-circle text-4xl mb-2 text-gray-400"></i>
+            <span class="font-semibold text-lg mb-1">No Rules Found</span>
+            <p class="text-gray-500 mb-3">Get started by creating your first rule.</p>
+            <button pButton label="Create Rule" icon="pi pi-plus" (click)="openNew()"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Rule Dialog -->
+  <p-dialog 
+    [(visible)]="showRuleDialog" 
+    [style]="{width: '900px'}" 
+    [header]="isNewRule ? 'Create Rule' : 'Edit Rule'" 
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="p-fluid">
+    
+    <ng-template pTemplate="content">
+      <form [formGroup]="ruleForm" *ngIf="currentRule">
+        <div class="grid formgrid">
+          <!-- Rule Details -->
+          <div class="col-12 mb-4">
+            <h3 class="text-xl font-medium mb-2">Rule Details</h3>
+            <div class="p-fluid grid formgrid">
+              <div class="field col-12">
+                <label for="name" class="font-medium">Rule Name*</label>
+                <input 
+                  id="name" 
+                  type="text" 
+                  pInputText 
+                  formControlName="name" 
+                  [ngClass]="{'ng-invalid ng-dirty': ruleForm.controls['name'].invalid && ruleForm.controls['name'].dirty}"
+                  required
+                />
+                <small 
+                  *ngIf="ruleForm.controls['name'].invalid && ruleForm.controls['name'].dirty" 
+                  class="p-error">Name is required and must be at least 3 characters.
+                </small>
+              </div>
+              
+              <div class="field col-12">
+                <label for="description" class="font-medium">Description</label>
+                <textarea 
+                  id="description" 
+                  pInputTextarea 
+                  formControlName="description" 
+                  [rows]="3"
+                  autoResize="true"
+                ></textarea>
+              </div>
+              
+              <div class="field col-6">
+                <label for="priority" class="font-medium">Priority*</label>
+                <p-dropdown 
+                  id="priority" 
+                  [options]="priorityOptions" 
+                  formControlName="priority" 
+                  placeholder="Select Priority"
+                  [showClear]="false"
+                ></p-dropdown>
+              </div>
+              
+              <div class="field col-6">
+                <label for="status" class="font-medium">Status*</label>
+                <p-dropdown 
+                  id="status" 
+                  [options]="statusOptions" 
+                  formControlName="status" 
+                  placeholder="Select Status"
+                  [showClear]="false"
+                ></p-dropdown>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Conditions -->
+          <div class="col-12 mb-4">
+            <div class="flex justify-content-between align-items-center mb-3">
+              <h3 class="text-xl font-medium m-0">Conditions</h3>
+              <div>
+                <label for="logicalOperator" class="mr-2">Combine with:</label>
+                <p-dropdown 
+                  id="logicalOperator" 
+                  [options]="logicalOperatorOptions" 
+                  formControlName="logicalOperator"
+                  [style]="{'width': '200px'}"
+                ></p-dropdown>
+              </div>
+            </div>
+            
+            <!-- Condition Builder -->
+            <p-card styleClass="mb-3">
+              <div class="grid formgrid">
+                <div class="field col">
+                  <label for="conditionField" class="font-medium">Field</label>
+                  <p-dropdown 
+                    id="conditionField"
+                    [options]="fieldOptions" 
+                    [(ngModel)]="newCondition!.field" 
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Select Field"
+                  ></p-dropdown>
+                </div>
+                
+                <div class="field col">
+                  <label for="conditionOperator" class="font-medium">Operator</label>
+                  <p-dropdown 
+                    id="conditionOperator"
+                    [options]="conditionOperatorOptions" 
+                    [(ngModel)]="newCondition!.operator" 
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Select Operator"
+                  ></p-dropdown>
+                </div>
+                
+                <div class="field col">
+                  <label for="conditionValue" class="font-medium">Value</label>
+                  <input 
+                    id="conditionValue" 
+                    type="text" 
+                    pInputText 
+                    [(ngModel)]="newCondition!.value" 
+                    [ngModelOptions]="{standalone: true}"
+                  />
+                </div>
+                
+                <div class="field col-1 flex align-items-end">
+                  <button 
+                    pButton 
+                    pRipple
+                    type="button" 
+                    icon="pi pi-plus" 
+                    class="p-button-success" 
+                    (click)="addCondition()"
+                  ></button>
+                </div>
+              </div>
+            </p-card>
+            
+            <!-- Condition List -->
+            <div class="max-h-[300px] overflow-y-auto mt-2" *ngIf="currentRule.conditions.conditions">
+              <p-card *ngFor="let condition of currentRule.conditions.conditions; let i = index" styleClass="mb-2">
+                <div class="flex justify-content-between align-items-center">
+                  <div class="flex-grow-1">
+                    <div class="flex items-center flex-wrap gap-1">
+                      <ng-container *ngIf="isSimpleCondition(condition)">
+                        <span class="font-medium">{{ getFieldNameById(getConditionField(condition)) }}</span>
+                        <span class="mx-1 text-gray-600">{{ getConditionOperator(condition) }}</span>
+                        <span class="font-medium">"{{ getConditionValue(condition) }}"</span>
+                      </ng-container>
+                      <ng-container *ngIf="isConditionGroup(condition)">
+                        <span class="font-medium">Group with {{ getConditionGroupLength(condition) }} conditions</span>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div>
+                    <button 
+                      pButton 
+                      pRipple
+                      type="button" 
+                      icon="pi pi-trash" 
+                      class="p-button-danger p-button-text" 
+                      (click)="removeCondition(i)"
+                    ></button>
+                  </div>
+                </div>
+              </p-card>
+              
+              <div *ngIf="currentRule.conditions.conditions.length === 0" class="text-center p-4 bg-gray-50 border border-gray-200 rounded-md">
+                <p class="text-gray-500">No conditions added yet. Add at least one condition above.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Actions -->
+          <div class="col-12">
+            <h3 class="text-xl font-medium mb-3">Actions</h3>
+            
+            <!-- Action Builder -->
+            <p-card styleClass="mb-3">
+              <div class="grid formgrid">
+                <div class="field col-12 md:col-6">
+                  <label for="actionType" class="font-medium">Action Type</label>
+                  <p-dropdown 
+                    id="actionType"
+                    [options]="actionTypeOptions" 
+                    [(ngModel)]="newAction.type" 
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Select Action Type"
+                  ></p-dropdown>
+                </div>
+                
+                <!-- Set Field Action -->
+                <ng-container *ngIf="newAction.type === ActionType.SET_FIELD">
+                  <div class="field col-12 md:col-3">
+                    <label for="actionField" class="font-medium">Field</label>
+                    <p-dropdown 
+                      id="actionField"
+                      [options]="fieldOptions" 
+                      [(ngModel)]="newAction.field" 
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="Select Field"
+                    ></p-dropdown>
+                  </div>
+                  
+                  <div class="field col-12 md:col-3">
+                    <label for="actionValue" class="font-medium">Value</label>
+                    <input 
+                      id="actionValue" 
+                      type="text" 
+                      pInputText 
+                      [(ngModel)]="newAction.value" 
+                      [ngModelOptions]="{standalone: true}"
+                    />
+                  </div>
+                </ng-container>
+                
+                <!-- Notify Action -->
+                <ng-container *ngIf="newAction.type === ActionType.NOTIFY">
+                  <div class="field col-12 md:col-6">
+                    <label for="notificationMessage" class="font-medium">Message</label>
+                    <input 
+                      id="notificationMessage" 
+                      type="text" 
+                      pInputText 
+                      [(ngModel)]="newAction.message" 
+                      [ngModelOptions]="{standalone: true}"
+                    />
+                  </div>
+                </ng-container>
+                
+                <!-- Apply Lifecycle Action -->
+                <ng-container *ngIf="newAction.type === ActionType.APPLY_LIFECYCLE">
+                  <div class="field col-12 md:col-6">
+                    <label for="lifecycleStage" class="font-medium">Lifecycle Stage</label>
+                    <input 
+                      id="lifecycleStage" 
+                      type="text" 
+                      pInputText 
+                      [(ngModel)]="newAction.lifecycleStage" 
+                      [ngModelOptions]="{standalone: true}"
+                    />
+                  </div>
+                </ng-container>
+                <!-- Modify Hedge Action -->
+                <ng-container *ngIf="newAction.type === ActionType.MODIFY_HEDGE">
+                  <div class="field col-12 md:col-6">
+                    <label for="hedgeParameters" class="font-medium">Hedge Parameters (JSON)</label>
+                    <textarea 
+                      id="hedgeParameters" 
+                      pInputTextarea 
+                      [(ngModel)]="newAction.parameters" 
+                      [ngModelOptions]="{standalone: true}"
+                      rows="4"
+                      placeholder="{'key': 'value'}"
+                    ></textarea>
+                    <small class="text-gray-500">Enter hedge modification parameters in JSON format</small>
+                  </div>
+                </ng-container>
+
+                
+                <div class="field col-12 flex justify-content-end">
+                  <button 
+                    pButton 
+                    pRipple
+                    type="button" 
+                    label="Add Action" 
+                    icon="pi pi-plus" 
+                    class="p-button-success" 
+                    (click)="addAction()"
+                    [disabled]="!newAction.type"
+                  ></button>
+                </div>
+              </div>
+            </p-card>
+            
+            <!-- Action List -->
+            <div class="max-h-[300px] overflow-y-auto mt-2">
+              <p-card *ngFor="let action of currentRule.actions; let i = index" styleClass="mb-2">
+                <div class="flex justify-content-between align-items-center">
+                  <div class="flex-grow-1">
+                    <p-tag 
+                      [value]="getActionTypeLabel(action.type)" 
+                      severity="info" 
+                      [rounded]="true"
+                      class="mr-2"
+                    ></p-tag>
+                    
+                    <ng-container *ngIf="action.type === ActionType.SET_FIELD">
+                      <span>Set <b>{{ getFieldNameById(action.field || '') }}</b> to <b>"{{ action.value }}"</b></span>
+                    </ng-container>
+                    
+                    <ng-container *ngIf="action.type === ActionType.NOTIFY">
+                      <span>Notification: <b>"{{ action.message }}"</b></span>
+                    </ng-container>
+                    
+                    <ng-container *ngIf="action.type === ActionType.APPLY_LIFECYCLE">
+                      <span>Apply lifecycle stage: <b>"{{ action.lifecycleStage }}"</b></span>
+                    </ng-container>
+                    
+                    <ng-container *ngIf="action.type === ActionType.HALT_PROCESSING">
+                      <span>Halt further rule processing</span>
+                    </ng-container>
+                    
+                    <ng-container *ngIf="action.type === ActionType.MODIFY_HEDGE">
+                      <span>Modify hedge (custom parameters)</span>
+                    </ng-container>
+                  </div>
+                  <div>
+                    <button 
+                      pButton 
+                      pRipple
+                      type="button" 
+                      icon="pi pi-trash" 
+                      class="p-button-danger p-button-text" 
+                      (click)="removeAction(i)"
+                    ></button>
+                  </div>
+                </div>
+              </p-card>
+              
+              <div *ngIf="!currentRule.actions || currentRule.actions.length === 0" class="text-center p-4 bg-gray-50 border border-gray-200 rounded-md">
+                <p class="text-gray-500">No actions added yet. Add at least one action above.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </ng-template>
+    
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveRule()"></button>
+    </ng-template>
+  </p-dialog>
+</div>

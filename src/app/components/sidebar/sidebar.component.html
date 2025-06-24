@@ -1,0 +1,50 @@
+<div class="flex flex-col h-full w-full bg-slate-50 border-r border-slate-200">
+  <div class="p-4">
+    <h3 class="text-lg font-semibold text-slate-800">Lifecycle Stages</h3>
+    <p class="text-sm text-slate-500">Manage hedge workflow stages</p>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="flex-1 overflow-y-auto p-2">
+    <ul class="list-none p-0 m-0">
+      <li *ngFor="let stage of stages" 
+          [ngClass]="getSelectionClass(stage.id)"
+          class="mb-2 rounded-md transition-colors duration-200 cursor-pointer hover:bg-slate-100">
+        <div class="flex items-center p-3" (click)="selectStage(stage.id)">
+          <div class="mr-3 text-xl">
+            <i [class]="stage.icon ? stage.icon : 'pi pi-circle-fill'" 
+               [pTooltip]="stage.status"
+               [tooltipPosition]="'right'"
+               [ngClass]="'text-' + getStatusSeverity(stage.status)"></i>
+          </div>
+          <div class="flex-1">
+            <span class="block font-semibold text-slate-800">{{ stage.name }}</span>
+            <span class="block text-xs text-slate-500 mt-1">{{ stage.description }}</span>
+            <div class="flex items-center mt-1">
+              <span class="text-xs text-slate-400 flex items-center">
+                {{ getActiveRuleCount(stage) }}/{{ getRuleCount(stage) }} rules active
+              </span>
+            </div>
+          </div>
+          <div class="ml-2" *ngIf="getRuleCount(stage) > 0">
+            <p-badge [value]="getRuleCount(stage).toString()" severity="info"></p-badge>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div *ngIf="stages.length === 0" class="p-4 text-center">
+      <p>No lifecycle stages found.</p>
+    </div>
+  </div>
+
+  <div class="mt-auto">
+    <p-divider></p-divider>
+    <div class="text-xs text-slate-500 p-2">
+      <p>Hedge Lifecycle Rule Builder</p>
+      <p>Version 1.0</p>
+    </div>
+  </div>
+</div>
+
