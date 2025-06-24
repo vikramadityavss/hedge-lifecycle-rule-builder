@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { BehaviorSubject, Observable, from, of } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
@@ -13,7 +13,8 @@ export class AuthService {
 
   constructor(
     private supabaseService: SupabaseService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {
     this.initializeUser();
   }
@@ -87,7 +88,7 @@ export class AuthService {
     return this.supabaseService.signOut().pipe(
       tap(() => {
         this.userSubject.next(null);
-        this.router.navigate(['/login']);
+        this.ngZone.run(() => this.router.navigate(['/login']));
       }),
       catchError(error => {
         console.error('Sign out error:', error);
