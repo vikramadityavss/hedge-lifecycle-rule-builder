@@ -30,6 +30,8 @@ import { AppComponent } from './app.component';
 import { RuleBuilderComponent } from './components/rule-builder/rule-builder.component.supabase';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { SimulationPanelComponent } from './components/simulation/simulation-panel.component';
 
 // Services
 import { SupabaseService } from './services/supabase.service';
@@ -72,7 +74,9 @@ import { AuthGuard } from './guards/auth.guard';
     // Standalone Components
     LoginComponent,
     RegisterComponent,
-    RuleBuilderComponent
+    RuleBuilderComponent,
+    SidebarComponent,
+    SimulationPanelComponent
   ],
   providers: [
     SupabaseService,

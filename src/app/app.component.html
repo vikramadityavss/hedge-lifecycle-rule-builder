@@ -19,9 +19,12 @@
   </div>
   
   <!-- Main Content -->
-  <div class="flex-grow-1">
-    <!-- Router Outlet - Components will be rendered here based on the current route -->
-    <router-outlet></router-outlet>
+  <div class="flex flex-grow-1">
+    <app-sidebar *ngIf="isAuthenticated" class="hidden md:block w-60 border-right-1 border-gray-200"></app-sidebar>
+    <div class="flex-grow p-3">
+      <!-- Router Outlet - Components will be rendered here based on the current route -->
+      <router-outlet></router-outlet>
+    </div>
   </div>
   
   <!-- Footer -->
