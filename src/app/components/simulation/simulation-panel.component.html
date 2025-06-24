@@ -19,7 +19,7 @@
             <div>
               <button pButton label="Reset" icon="pi pi-refresh" class="p-button-outlined p-button-secondary mr-2" (click)="resetForm()"></button>
               <button pButton label="Save" icon="pi pi-save" class="p-button-outlined mr-2" (click)="saveSimulationEnvironment()"></button>
-              <button pButton label="Run Simulation" icon="pi pi-play" class="p-button-success" [disabled]="simulationForm.invalid || isSimulating" (click)="runSimulation()"></button>
+              <button pButton label="Run Simulation" icon="pi pi-play" class="p-button-success cta-button" [disabled]="simulationForm.invalid || isSimulating" (click)="runSimulation()"></button>
             </div>
           </div>
         </ng-template>
