@@ -358,7 +358,8 @@ export class RuleService {
         } else {
           logicExpr = { "==": [{ var: field }, value] }; // Fallback to equals if value format is incorrect
         }
-        break;default:
+        break;
+      default:
         logicExpr = { "==": [{ var: field }, value] };
     }
     
