@@ -29,7 +29,7 @@ export class SupabaseService {
       environment.supabaseKey,
       {
         auth: {
-          storage: localStorage,
+          storage: window.localStorage,
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true
